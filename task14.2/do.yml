@@ -1,0 +1,33 @@
+- hosts: localhost
+  vars_prompt:
+          - name: container_name
+            prompt: Enter the conatiner name to create
+            private: no
+          - name: webport
+            prompt: Enter the port to be exposed by httpd(80)
+            private: no
+
+  tasks:
+      - name: Launching a docker container
+        docker_container:
+            name: "{{ container_name }}"
+            image: venkateshsandupatla/centos-ssh:v1
+            ports:
+               - "{{ webport }}:80"
+            detach: yes
+            interactive: yes
+      - name: Retriving container ip
+        docker_container_info:
+             name: "{{ container_name }}"
+        register: ip
+      - debug:
+         var: ip.container.NetworkSettings.IPAddress
+      - name: updating inventory
+        blockinfile:
+            path: /root/ip.txt
+            block: |
+                [docker]
+                {{ ip.container.NetworkSettings.IPAddress }} ansible_user=root ansible_ssh_password=root ansible_connection=ssh
+
+
+

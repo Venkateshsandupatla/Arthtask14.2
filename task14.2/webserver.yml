@@ -1,0 +1,13 @@
+- hosts: docker
+  tasks:
+  - name: Apache/httpd  webserver installing
+    package:
+         name: httpd
+         state: present
+  - name: writting  webpage
+    copy:
+       content: "Hi everyone this is docker conatiner"
+       dest: /var/www/html/index.html
+  - name: service-Start
+    command: "/usr/sbin/httpd"
+
